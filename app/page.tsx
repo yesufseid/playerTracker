@@ -1,16 +1,41 @@
-import Hero from "@/components/hero";
-import ConnectSupabaseSteps from "@/components/tutorial/connect-supabase-steps";
-import SignUpUserSteps from "@/components/tutorial/sign-up-user-steps";
-import { hasEnvVars } from "@/utils/supabase/check-env-vars";
+'use client';
 
-export default async function Home() {
+import { useState, useEffect } from 'react';
+import { Add } from '@mui/icons-material';
+import BasicTabs from './component/Tab';
+import AddPlayerDialog from './component/Dialog';
+import {  Button} from '@mui/material';
+import { useDispatch, useSelector } from "react-redux";
+import { RootState, AppDispatch } from "../app/Redux/store";
+
+
+const PlayerTracker = () => {
+  const [open, setOpen] = useState(false);
+  const [newPlayer, setNewPlayer] = useState({ name: "", shoeNumber: "" });
+  const dispatch = useDispatch<AppDispatch>();
+  const { players, error, loading, } = useSelector((state: RootState) => state.player);
+ 
+ 
+  useEffect(() => {
+    dispatch({ type: "players/fetchPlayers"});
+  }, [dispatch]);
   return (
-    <>
-      <Hero />
-      <main className="flex-1 flex flex-col gap-6 px-4">
-        <h2 className="font-medium text-xl mb-4">Next steps</h2>
-        {hasEnvVars ? <SignUpUserSteps /> : <ConnectSupabaseSteps />}
-      </main>
-    </>
+    <div className="flex flex-col items-center p-6 bg-gray-100 min-h-screen">
+     <BasicTabs players={players}  />
+      
+      <Button
+        variant="contained"
+        color="primary"
+        className="fixed bottom-6 right-6"
+        startIcon={<Add />}
+        onClick={() => setOpen(true)}
+      >
+        Add Player
+      </Button>
+      <AddPlayerDialog   open={open} setOpen={setOpen} />
+
+    </div>
   );
-}
+};
+
+export default PlayerTracker;
