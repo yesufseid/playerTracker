@@ -1,6 +1,6 @@
 import { call, put, takeEvery } from "redux-saga/effects";
-import {setPlayer,setLoading,setError,addPlayer} from "./playerSilce"
-import { GetAll,AddPlayer,AddTime } from "../lib/index";
+import {setPlayer,setLoading,setError,addPlayer,addDuration,setTLoading,setTError,removePlayer} from "./playerSilce"
+import { GetAll,AddPlayer,AddTime,deletePlayer } from "../lib/index";
 
 
 function* fetchPlayers() {
@@ -21,13 +21,13 @@ function* fetchPlayers() {
 }
 function* fechandAddPlayers(action:any) {
   try {
-    yield put(setError(false));
-    yield put(setLoading(true));
+    yield put(setTError(false));
+    yield put(setTLoading(true));
      // Pass arguments to GetGraduates
      const response =yield call(AddPlayer,action.payload.name,action.payload.shoeNumber, action.payload.startTime);
-    yield put(setLoading(false));
+    yield put(setTLoading(false));
     if(response.error){
-      yield put(setError(true))
+      yield put(setTError(true))
     }else{
       yield put(addPlayer(response))
     }    
@@ -37,24 +37,41 @@ function* fechandAddPlayers(action:any) {
 }
 function* fechandAddTime(action:any) {
   try {
-    yield put(setError(false));
-    yield put(setLoading(true));
+    yield put(setTError(false));
+    yield put(setTLoading(true));
      // Pass arguments to GetGraduates
      const response =yield call(AddTime,action.payload.id, action.payload.duration);
-    yield put(setLoading(false));
+    yield put(setTLoading(false));
     if(response.error){
-      yield put(setError(true))
+      yield put(setTError(true))
     }else{
-      yield put(addPlayer(response))
+      yield put(addDuration(response))
     }    
   } catch (error) {
     console.error("Failed to fetch stats:", error);
   }
 }
 
+function* fechandremove(action:any) {
+  try {
+    yield put(setTError(false));
+    yield put(setTLoading(true));
+     // Pass arguments to GetGraduates
+     const response =yield call(deletePlayer,action.payload.id);
+    yield put(setTLoading(false));
+    if(response.error){
+      yield put(setTError(true))
+    }else{
+      yield put(removePlayer(response.id))
+    }    
+  } catch (error) {
+    console.error("Failed to fetch stats:", error);
+  }
+}
 export default function* GratuateSaga() {
   yield takeEvery("players/fetchPlayers",fetchPlayers);
   yield takeEvery("players/fechandAddPlayers",fechandAddPlayers);
   yield takeEvery("players/fechandAddTime",fechandAddTime);
+  yield takeEvery("players/fechandremove",fechandremove);
 
 }

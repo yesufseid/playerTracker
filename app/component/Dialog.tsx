@@ -2,11 +2,13 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "../Redux/store";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import { Dialog, DialogActions, DialogContent, DialogTitle, TextField, Button, RadioGroup, FormControlLabel, Radio, FormControl } from '@mui/material';
 
 function AddPlayerDialog({ open, setOpen }:{open:boolean,setOpen:React.Dispatch<React.SetStateAction<boolean>>}) {
    const dispatch = useDispatch<AppDispatch>();
-   const { players, error, loading, } = useSelector((state: RootState) => state.player);
+   const {Terror} = useSelector((state: RootState) => state.player);
   const [newPlayer, setNewPlayer] = useState({
     name: '',
     shoeNumber: '',
@@ -17,17 +19,20 @@ const handleSumit=()=>{
   console.log(newPlayer.Time);
   
       dispatch({ type: "players/fechandAddPlayers",payload:newPlayer});
+       Terror ? toast.error('Operation successful!', { autoClose: 3000 }):toast.success('Operation successful!', { autoClose: 3000 });
+      
 }
   const handleStartTimeChange = (event:React.ChangeEvent<HTMLInputElement>) => {
-    setNewPlayer({ ...newPlayer, Time:event.target.value,});
+    setNewPlayer({ ...newPlayer, Time:event.target.value});
   };
 
   const handleCustomTimeChange = (e:React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setNewPlayer({ ...newPlayer, startTime:e.target.value });
+    const start_Time = new Date(e.target.value);
+    setNewPlayer({ ...newPlayer, startTime:start_Time.toISOString()});
   };
 
   return (
-    <Dialog open={open} onClose={() => setOpen(false)}>
+    <Dialog open={open} onClose={() => setOpen(false)} className='absolute' >
       <DialogTitle>Add New Player</DialogTitle>
       <DialogContent>
         <TextField
@@ -85,6 +90,7 @@ const handleSumit=()=>{
           Add
         </Button>
       </DialogActions>
+      <ToastContainer />
     </Dialog>
   );
 }
