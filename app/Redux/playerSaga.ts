@@ -3,7 +3,7 @@ import {setPlayer,setLoading,setError,addPlayer,addDuration,setTLoading,setTErro
 import { GetAll,AddPlayer,AddTime,deletePlayer,UpdateStatus } from "../lib/index";
 
 
-function* fetchPlayers() {
+function* fetchPlayers(): Generator<any, void, any>{
   try {
     yield put(setError(false));
     yield put(setLoading(true));
@@ -19,7 +19,7 @@ function* fetchPlayers() {
     console.error("Failed to fetch stats:", error);
   }
 }
-function* fechandAddPlayers(action:any) {
+function* fechandAddPlayers(action:any): Generator<any, void, any> {
   try {
     yield put(setTError(false));
     yield put(setTLoading(true));
@@ -35,7 +35,7 @@ function* fechandAddPlayers(action:any) {
     console.error("Failed to fetch stats:", error);
   }
 }
-function* fechandAddTime(action:any) {
+function* fechandAddTime(action:any): Generator<any, void, any> {
   try {
     yield put(setTError(false));
     yield put(setTLoading(true));
@@ -52,7 +52,7 @@ function* fechandAddTime(action:any) {
   }
 }
 
-function* fechandremove(action:any) {
+function* fechandremove(action:any): Generator<any, void, any> {
   try {
     yield put(setTError(false));
     yield put(setTLoading(true));
@@ -68,7 +68,7 @@ function* fechandremove(action:any) {
     console.error("Failed to fetch stats:", error);
   }
 }
-function* fechandupdateStatus(action:any) {
+function* fechandupdateStatus(action:any): Generator<any, void, any>{
   try {
     yield put(setTError(false));
     yield put(setTLoading(true));
