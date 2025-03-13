@@ -45,6 +45,7 @@ const GetAll = async () => {
     const { data, error } = await supabase
     .from('players')
     .select('*')
+    .eq('active', 'true')  
     .gte('created_at', startOfDayISO)
     .lt('created_at', endOfDayISO);
 

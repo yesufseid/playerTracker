@@ -1,6 +1,6 @@
 import { call, put, takeEvery } from "redux-saga/effects";
 import {setPlayer,setLoading,setError,addPlayer,addDuration,setTLoading,setTError,removePlayer} from "./playerSilce"
-import { GetAll,AddPlayer,AddTime,deletePlayer } from "../lib/index";
+import { GetAll,AddPlayer,AddTime,deletePlayer,UpdateStatus } from "../lib/index";
 
 
 function* fetchPlayers() {
@@ -68,10 +68,27 @@ function* fechandremove(action:any) {
     console.error("Failed to fetch stats:", error);
   }
 }
+function* fechandupdateStatus(action:any) {
+  try {
+    yield put(setTError(false));
+    yield put(setTLoading(true));
+     // Pass arguments to GetGraduates
+     const response =yield call(UpdateStatus,action.payload.id);
+    yield put(setTLoading(false));
+    if(response.error){
+      yield put(setTError(true))
+    }else{
+      yield put(removePlayer(response.id))
+    }    
+  } catch (error) {
+    console.error("Failed to fetch stats:", error);
+  }
+}
 export default function* GratuateSaga() {
   yield takeEvery("players/fetchPlayers",fetchPlayers);
   yield takeEvery("players/fechandAddPlayers",fechandAddPlayers);
   yield takeEvery("players/fechandAddTime",fechandAddTime);
   yield takeEvery("players/fechandremove",fechandremove);
+  yield takeEvery("players/fechandupdateStatus",fechandupdateStatus);
 
 }

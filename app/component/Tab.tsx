@@ -16,6 +16,7 @@ interface Player {
   shoe_number: number;
   start_time: string;
   duration:number
+  active:boolean
 }
 
 type Props = {
@@ -40,6 +41,10 @@ const handleAddTime=(id:string,duration:number)=>{
 }
 const handleDelete=(id:string)=>{
   dispatch({ type: "players/fechandremove",payload:{id:id}}); 
+  Terror ? toast.error('somthing is wrong!', { autoClose: 3000 }):toast.success('Operation successful!', { autoClose: 3000 });
+}
+const handleStatus=(id:string)=>{
+  dispatch({ type: "players/fechandupdateStatus",payload:{id:id}}); 
   Terror ? toast.error('somthing is wrong!', { autoClose: 3000 }):toast.success('Operation successful!', { autoClose: 3000 });
 }
 
@@ -113,7 +118,13 @@ const calculateStatus = (player: Player) => {
                 <IconButton  onClick={()=>handleDelete(player.id)} >
                   <Delete color="error" />
                 </IconButton>
-               
+                {
+                  tab===2 &&
+                
+                <IconButton  onClick={()=>handleStatus(player.id)} >
+                  <Done color="error" />
+                </IconButton>
+                }
               </TableCell>
             </TableRow>
           ))}
