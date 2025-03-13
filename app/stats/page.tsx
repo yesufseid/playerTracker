@@ -5,7 +5,14 @@ import dayjs from "dayjs";
 import { GetStatus } from "../lib";
 import Loading from "../component/Loading";
 
-
+type PlayerProps={
+  id:string
+  name:string
+  start_time:string
+  duration:number
+  shoe_number:number
+  created_at:string
+}
 
 
 export default function StatusPage() {
@@ -21,7 +28,7 @@ export default function StatusPage() {
     const handler=async()=>{
       setError(false)
         setLoading(true)
-        const data=await GetStatus()
+        const data:any=await GetStatus()
         if(data.length >= 0){
           setError(false)
           setLoading(false) 
@@ -33,33 +40,56 @@ export default function StatusPage() {
     }
     handler()
   },[tryAgain])
-  const filterData = (data:[]) => {
-    const today = dayjs().startOf("day");
-    const startOfWeek = dayjs().startOf("week");
-
-    const dailyData = data.filter((player) => dayjs(player.start_time).isSame(today, "day"));
-    const weeklyData = data.filter((player) => dayjs(player.start_time).isAfter(startOfWeek));
-
+  const filterData = (data: PlayerProps[]) => {
+    const today = new Date();
+  
+    // Convert local 6:00 AM to UTC (3:00 AM UTC)
+const startOfToday = new Date(today);
+startOfToday.setUTCHours(3, 0, 0, 0); // 6:00 AM EAT = 3:00 AM UTC
+const startOfDayISO = startOfToday.toISOString();
+  
+  // End of the "custom day" (5:59 AM the next day in EAT = 2:59 AM UTC)
+  const endOfDay = new Date(startOfToday);
+  endOfDay.setUTCDate(endOfDay.getUTCDate() + 1);  // Move to next day
+  endOfDay.setUTCHours(2, 59, 59, 999);  // 5:59 AM EAT = 2:59 AM UTC
+  const endOfDayISO = endOfDay.toISOString();
+  
+    // Start of the week on Sunday at 6:00 AM (EAT) (converted to 3:00 AM UTC)
+    const startOfWeek = new Date(startOfToday);
+    startOfWeek.setUTCDate(startOfWeek.getUTCDate() - startOfWeek.getUTCDay()); // Set to Sunday
+    const startOfWeekISO = startOfWeek.toISOString()
+  
+    // Filter daily data (created after 6:00 AM today and before 6:00 AM tomorrow EAT)
+    const dailyData:any = data.filter((player: PlayerProps) => {
+      const createdAt = new Date(player.created_at);
+      return createdAt >= new Date(startOfDayISO) && createdAt < new Date(endOfDayISO);
+    });
+  
+    // Filter weekly data (created after 6:00 AM Sunday EAT)
+    const weeklyData:any = data.filter((player: PlayerProps) => {
+      const createdAt = new Date(player.created_at);
+      return createdAt >= new Date(startOfWeekISO);
+    });
+  
     setDaily(dailyData);
     setWeekly(weeklyData);
   };
+  
+  
 
-  const handleTabChange = (event,newValue) => {
-    setTab(newValue);
-  };
-
-  const handlePriceChange = (event) => {
+  const handlePriceChange = (event:any) => {
     setPrice(event.target.value);
   };
 
-  const calculateRevenue = (data:[]) => {
-    const totalDuration = data.reduce((sum, d) => sum + d.duration, 0);
-    return totalDuration * parseFloat(price);
+  const calculateRevenue = (data:any[]) => {
+    const totalDuration = data.reduce((sum, d:PlayerProps) => sum + d.duration, 0);
+    return totalDuration * price
   };
 
   return (
-    <div className="flex flex-col items-center p-6 bg-gray-100 min-h-screen">
-    <Container>
+    <div className="flex flex-col items-center  bg-gray-100 min-h-screen">
+    <Container className="md:max-w-4xl p-0 m-0">
+      <div className="md:px-5">
       <Typography variant="h4" gutterBottom  sx={{ marginTop: 2 ,color: 'black'} }>
         Player Status
       </Typography>
@@ -73,8 +103,8 @@ export default function StatusPage() {
         onChange={handlePriceChange}
         sx={{ marginBottom: 2 }}
       />
-
-      <Tabs value={tab} onChange={handleTabChange} centered>
+</div>
+      <Tabs value={tab} onChange={(_, newValue) => setTab(newValue)} centered>
         <Tab label="Daily Status" />
         <Tab label="Weekly Status" />
       </Tabs>
@@ -85,7 +115,7 @@ export default function StatusPage() {
             Daily Revenue: ${calculateRevenue(daily)}
           </Typography>
           <Typography variant="h6" gutterBottom sx={{ color: 'black' }}>
-            Total Players: ${daily.length}
+            Total Players:{daily.length}
           </Typography>
           <TableContainer component={Paper}>
             <Table>
@@ -98,7 +128,7 @@ export default function StatusPage() {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {daily.map((player) => (
+                {daily.map((player:PlayerProps) => (
                   <TableRow key={player.id}>
                     <TableCell>{player.name}</TableCell>
                     <TableCell>{player.shoe_number}</TableCell>
@@ -118,7 +148,7 @@ export default function StatusPage() {
             Weekly Revenue: ${calculateRevenue(weekly)}
           </Typography>
           <Typography variant="h6" gutterBottom sx={{ color: 'black' }}>
-            Total Players: ${weekly.length}
+            Total Players:{weekly.length}
           </Typography>
           <TableContainer component={Paper}>
             <Table>
@@ -131,7 +161,7 @@ export default function StatusPage() {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {weekly.map((player) => (
+                {weekly.map((player:PlayerProps) => (
                   <TableRow key={player.id}>
                     <TableCell>{player.name}</TableCell>
                     <TableCell>{player.shoe_number}</TableCell>

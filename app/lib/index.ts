@@ -24,50 +24,66 @@ const AddPlayer=async( name:string, shoeNumber:number, startTime:Date )=>{
   }
 }
 
-const GetAll=async()=>{
-  const startOfToday = new Date(); 
-  startOfToday.setHours(6, 0, 0, 0); // Set time to 6:00 A
-const startOfTomorrow = new Date();
-startOfTomorrow.setHours(24, 0, 0, 0); // 30 hours = 6 AM next day
-  const supabase=await createClient()
-   try {
-    const { data, error } = await supabase.from('players').select() 
-    .eq('active',true)
-    .gte('start_time', startOfToday.toISOString()) // From 6 AM today
-    .lt('start_time', startOfTomorrow.toISOString());
-    if(error){
-      console.log(error);
-      return {error:true}
-    }else{
-      console.log(data);
-      
-      return data
-    }
-    
-   } catch (error) {
-    console.log(error);
-    return {error:true}
-   }
-}
-const GetStatus = async () => {
-  // Get the start of the current week (Monday 6:00 AM)
-  const startOfWeek = new Date();
-  const dayOfWeek = startOfWeek.getDay();
-  const diffToMonday = (dayOfWeek === 0 ? 6 : dayOfWeek - 1); // If today is Sunday, adjust to Monday (0 = Sunday)
-  startOfWeek.setDate(startOfWeek.getDate() - diffToMonday); // Adjust to the previous Monday
-  startOfWeek.setHours(6, 0, 0, 0); // Set time to 6:00 AM on Monday
 
-  // Get the end of the current week (next Sunday 6:00 AM)
-  const endOfWeek = new Date(startOfWeek);
-  endOfWeek.setDate(startOfWeek.getDate() + 7); // Next Sunday
-  endOfWeek.setHours(6, 0, 0, 0); // Set time to 6:00 AM on Sunday
+
+const GetAll = async () => {
+  const supabase=await createClient()
+  const today = new Date();
+
+  // Convert to UTC (since your local 6:00 AM = 3:00 AM UTC)
+  const startOfDay = new Date(today);
+  startOfDay.setUTCHours(3, 0, 0, 0);  // 6:00 AM EAT = 3:00 AM UTC
+  const startOfDayISO = startOfDay.toISOString();
   
+  // End of the "custom day" (5:59 AM the next day in EAT = 2:59 AM UTC)
+  const endOfDay = new Date(startOfDay);
+  endOfDay.setUTCDate(endOfDay.getUTCDate() + 1);  // Move to next day
+  endOfDay.setUTCHours(2, 59, 59, 999);  // 5:59 AM EAT = 2:59 AM UTC
+  const endOfDayISO = endOfDay.toISOString();
+  try {
+   
+    const { data, error } = await supabase
+    .from('players')
+    .select('*')
+    .gte('created_at', startOfDayISO)
+    .lt('created_at', endOfDayISO);
+
+
+    if (error) {
+      console.error("Supabase Error:", error);
+      return { error: true };
+    }
+
+    console.log("Fetched Data:", data);
+    return data;
+  } catch (error) {
+    console.error("Try-Catch Error:", error);
+    return { error: true };
+  }
+};
+
+const GetStatus = async () => {
   const supabase = await createClient();
+  const today = new Date();
+
+// Convert local 6:00 AM to UTC (3:00 AM UTC)
+const startOfToday = new Date(today);
+startOfToday.setUTCHours(3, 0, 0, 0); // 6:00 AM EAT = 3:00 AM UTC
+
+// Find the start of the current week based on your 6:00 AM rule
+const startOfWeek = new Date(startOfToday);
+startOfWeek.setUTCDate(startOfWeek.getUTCDate() - startOfWeek.getUTCDay()); // Set to Sunday
+const startOfWeekISO = startOfWeek.toISOString();
+
+// Get current time (UTC) as the end range
+const nowISO = new Date().toISOString();
   
   try {
-    const { data, error } = await supabase.from('players').select()
-      .gte('start_time', startOfWeek.toISOString()) // From Monday 6 AM
-      .lt('start_time', endOfWeek.toISOString()); // Until next Sunday 6 AM
+    const { data, error } = await supabase
+  .from('players')
+  .select('*')
+  .gte('created_at', startOfWeekISO)
+  .lt('created_at', nowISO);
     
     if (error) {
       console.log(error);

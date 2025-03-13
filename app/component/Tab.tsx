@@ -24,10 +24,12 @@ type Props = {
 
 export default function BasicTabs() {
   const dispatch = useDispatch<AppDispatch>();
-  const {players,error, loading,Terror,Tloading } = useSelector((state: RootState) => state.player);
+  const {players,error, loading,Terror} = useSelector((state: RootState) => state.player);
   const [tab, setTab] = useState(0);
   const [localPlayers, setLocalPlayers] = useState<Player[]>([]);
-
+  useEffect(() => {
+    dispatch({ type: "players/fetchPlayers"});
+  }, [dispatch]);
   useEffect(() => {
     setLocalPlayers(players); // Ensure hydration consistency
   }, [players]);
@@ -65,12 +67,7 @@ const calculateStatus = (player: Player) => {
     const timeLeft = endTime - now;
     const minutes = Math.floor(Math.abs(timeLeft) / 60000);
      const seconds = Math.floor((Math.abs(timeLeft) / 1000) % 60);;
-
-    // if (timeLeft > 0) {
       return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-    // } else {
-    //   return `${Math.abs(minutes).toString().padStart(2, '0')}:${Math.abs(seconds).toString().padStart(2, '0')} ago`;
-    // }
   };
 
   useEffect(() => {
@@ -86,9 +83,7 @@ const calculateStatus = (player: Player) => {
   });
 
   return (
-    <Card className="p-6 w-full max-w-4xl shadow-lg">
-      <h2 className="text-2xl font-bold mb-4 text-center">Game Player Tracker</h2>
-
+    <Card className="w-full md:max-w-4xl shadow-lg">
       <Tabs value={tab} onChange={(_, newValue) => setTab(newValue)} centered>
         <Tab label="Active" />
         <Tab label="Pending" />

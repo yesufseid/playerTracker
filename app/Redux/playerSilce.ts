@@ -1,5 +1,5 @@
 
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice} from "@reduxjs/toolkit";
 
 type PlayerProps={
   id:string
@@ -7,25 +7,41 @@ type PlayerProps={
   start_time:string
   duration:number
   active:boolean
+  shoe_number: number;
+  created_at:string
 
 }
+interface PlayerState {
+  players: PlayerProps[];
+  loading: boolean;
+  error: boolean;
+  Tloading: boolean;
+  Terror: boolean;
+}
 
+const initialState: PlayerState = {
+  players: [],
+  loading: false,
+  error: false,
+  Tloading: false,
+  Terror: false,
+};
 const  playerSlice = createSlice({
   name: "player",
-  initialState: {players:[],loading:false,error:false,Tloading:false,Terror:false},
+  initialState,
   reducers: {
     setPlayer: (state, action) => {
       state.players = action.payload;
     },
-    addPlayer: (state, action:{}) => {
+    addPlayer: (state, action) => {
       state.players.push(action.payload)
     },
     removePlayer: (state, action) => {
-      state.players = state.players.filter(player => player.id !== action.payload)
+      state.players = state.players.filter((player:PlayerProps)=> player.id !== action.payload)
     },
     addDuration: (state, action) => {
       const { id, duration } = action.payload; 
-      const playerIndex = state.players.findIndex(player => player.id === id);
+      const playerIndex = state.players.findIndex((player:PlayerProps )=> player.id === id);
       state.players[playerIndex].duration=duration
     },
     setLoading: (state, action) => {

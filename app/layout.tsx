@@ -2,6 +2,7 @@
 import { Geist } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import {Providers}  from "./lib/Provider";
+import  Header from "./component/Header"
 import "./globals.css";
 
 const defaultUrl = process.env.VERCEL_URL
@@ -34,6 +35,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <Providers>
+            <Header />
                 {children}
           </Providers>
         </ThemeProvider>
