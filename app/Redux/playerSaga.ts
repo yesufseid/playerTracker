@@ -1,6 +1,6 @@
 import { call, put, takeEvery } from "redux-saga/effects";
-import {setPlayer,setLoading,setError,addPlayer,addDuration,setTLoading,setTError,removePlayer} from "./playerSilce"
-import { GetAll,AddPlayer,AddTime,deletePlayer,UpdateStatus } from "../lib/index";
+import {setPlayer,setLoading,setError,addPlayer,addDuration,setTLoading,setTError,removePlayer,setAllPlayer,addAllPlayer} from "./playerSilce"
+import { GetAll,AddPlayer,AddTime,deletePlayer,UpdateStatus ,GetStatus} from "../lib/index";
 
 
 function* fetchPlayers(): Generator<any, void, any>{
@@ -14,6 +14,22 @@ function* fetchPlayers(): Generator<any, void, any>{
       yield put(setError(true))
     }else{
       yield put(setPlayer(response))
+    }
+  } catch (error) {
+    console.error("Failed to fetch stats:", error);
+  }
+}
+function* fetchandSetStatus(action:any): Generator<any, void, any>{
+  try {
+    yield put(setError(false));
+    yield put(setLoading(true));
+     // Pass arguments to GetGraduates
+     const response =yield call(GetStatus,action.limit,action.cursor);
+    yield put(setLoading(false));
+    if(response.error){
+      yield put(setError(true))
+    }else{
+      yield put(setAllPlayer(response))
     }
   } catch (error) {
     console.error("Failed to fetch stats:", error);
@@ -90,5 +106,6 @@ export default function* GratuateSaga() {
   yield takeEvery("players/fechandAddTime",fechandAddTime);
   yield takeEvery("players/fechandremove",fechandremove);
   yield takeEvery("players/fechandupdateStatus",fechandupdateStatus);
+  yield takeEvery("players/fetchandSetStatus",fetchandSetStatus);
 
 }

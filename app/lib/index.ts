@@ -46,8 +46,8 @@ const GetAll = async () => {
     .from('players')
     .select('*')
     .eq('active', 'true')  
-    .gte('created_at', startOfDayISO)
-    .lt('created_at', endOfDayISO);
+    .gte('start_time', startOfDayISO)
+
 
 
     if (error) {
@@ -63,41 +63,78 @@ const GetAll = async () => {
   }
 };
 
-const GetStatus = async () => {
-  const supabase = await createClient();
-  const today = new Date();
+// const GetStatus = async () => {
+//   const supabase = await createClient();
+//   const today = new Date();
 
-// Convert local 6:00 AM to UTC (3:00 AM UTC)
-const startOfToday = new Date(today);
-startOfToday.setUTCHours(3, 0, 0, 0); // 6:00 AM EAT = 3:00 AM UTC
+// // Convert local 6:00 AM to UTC (3:00 AM UTC)
+// const startOfToday = new Date(today);
+// startOfToday.setUTCHours(3, 0, 0, 0); // 6:00 AM EAT = 3:00 AM UTC
 
-// Find the start of the current week based on your 6:00 AM rule
-const startOfWeek = new Date(startOfToday);
-startOfWeek.setUTCDate(startOfWeek.getUTCDate() - startOfWeek.getUTCDay()); // Set to Sunday
-const startOfWeekISO = startOfWeek.toISOString();
+// // Find the start of the current week based on your 6:00 AM rule
+// const startOfWeek = new Date(startOfToday);
+// startOfWeek.setUTCDate(startOfWeek.getUTCDate() - startOfWeek.getUTCDay()); // Set to Sunday
+// const startOfWeekISO = startOfWeek.toISOString();
 
-// Get current time (UTC) as the end range
-const nowISO = new Date().toISOString();
+// // Get current time (UTC) as the end range
+// const nowISO = new Date().toISOString();
   
-  try {
-    const { data, error } = await supabase
-  .from('players')
-  .select('*')
-  .gte('created_at', startOfWeekISO)
-  .lt('created_at', nowISO);
+//   try {
+//     const { data, error } = await supabase
+//   .from('players')
+//   .select('*')
+//   .gte('start_time', startOfWeekISO)
+//   .lt('start_time', nowISO)
+//   .order('start_time',{ascending:false})
     
-    if (error) {
-      console.log(error);
-      return { error: true };
-    } else {
-      console.log(data);
-      return data;
+//     if (error) {
+//       console.log(error);
+//       return { error: true };
+//     } else {
+//       console.log(data);
+//       return data;
+//     }
+//   } catch (error) {
+//     console.log(error);
+//     return { error: true };
+//   }
+// }
+
+const GetStatus = async (limit:number,cursor:any) => {
+  console.log(limit,cursor);
+  
+  const supabase = await createClient();
+  try {
+    let query = supabase
+      .from('players')
+      .select('*')
+      .order('start_time', { ascending: false }) // Newest first
+      .limit(limit + 1); // Fetch extra item to check if more exist
+
+    if (cursor) {
+      query = query.lte('start_time',cursor); // Load only older data
     }
+
+    const { data, error } = await query;
+
+    if (error) {
+      console.error("Supabase Error:", error);
+      return { error: true };
+    }
+
+    // Check if more data exists
+    const hasMore = data.length > limit;
+    const results = hasMore ? data.slice(0, limit) : data;
+    const newCursor = hasMore ? results[results.length - 1].start_time: null;
+    console.log(data);
+    
+    return { data: results, hasMore, newCursor };
   } catch (error) {
-    console.log(error);
+    console.error("Try-Catch Error:", error);
     return { error: true };
   }
-}
+};
+
 
 const UpdateStatus=async(id:string)=>{
   const supabase=await createClient()

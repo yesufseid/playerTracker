@@ -1,9 +1,10 @@
 "use client"
 import { useEffect, useState } from "react";
-import { Container, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Tabs, Tab, TextField } from "@mui/material";
-import dayjs from "dayjs";
-import { GetStatus } from "../lib";
+import { Container, Typography, Table, TableBody, TableCell, TableContainer, 
+  TableHead, TableRow, Paper, Tabs, Tab, TextField,Button , CircularProgress } from "@mui/material";
 import Loading from "../component/Loading";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState, AppDispatch } from "../Redux/store";
 
 type PlayerProps={
   id:string
@@ -11,36 +12,34 @@ type PlayerProps={
   start_time:string
   duration:number
   shoe_number:number
-  created_at:string
 }
 
 
 export default function StatusPage() {
+  const dispatch = useDispatch<AppDispatch>();
+  const {AllPlayers,error,loading,Terror,hasMore,newCursor,Tloading} = useSelector((state: RootState) => state.Allplayer);
   const [daily, setDaily] = useState([]);
   const [weekly, setWeekly] = useState([]);
   const [tab, setTab] = useState(0);
   const [price, setPrice] = useState(200);
-  const [loading,setLoading]=useState(false)
-  const [error,setError]=useState(false)
   const [tryAgain,setTray]=useState(false)
+ 
 
-  useEffect(()=>{
-    const handler=async()=>{
-      setError(false)
-        setLoading(true)
-        const data:any=await GetStatus()
-        if(data.length >= 0){
-          setError(false)
-          setLoading(false) 
-          filterData(data); 
-        }else{
-          setLoading(false) 
-           setError(true)
-        }
+  useEffect(() => {
+    dispatch({ type: "players/fetchandSetStatus",payload:{limit:3,cursor:newCursor}});
+  }, [dispatch,tryAgain]);
+  useEffect(() => {
+    if (AllPlayers?.length > 0) {
+      filterData(AllPlayers);
     }
-    handler()
-  },[tryAgain])
-  const filterData = (data: PlayerProps[]) => {
+  }, [AllPlayers]); // Runs when AllPlayers changes
+   const HandlerMoreData=async()=>{
+    dispatch({ type: "players/fetchandAddStatus",payload:{limit:3,cursor:newCursor}});
+   }
+
+  const filterData = (data:PlayerProps[]) => {
+    console.log("seya",data);
+    
     const today = new Date();
   
     // Convert local 6:00 AM to UTC (3:00 AM UTC)
@@ -61,22 +60,19 @@ const startOfDayISO = startOfToday.toISOString();
   
     // Filter daily data (created after 6:00 AM today and before 6:00 AM tomorrow EAT)
     const dailyData:any = data.filter((player: PlayerProps) => {
-      const createdAt = new Date(player.created_at);
+      const createdAt = new Date(player.start_time);
       return createdAt >= new Date(startOfDayISO) && createdAt < new Date(endOfDayISO);
     });
   
     // Filter weekly data (created after 6:00 AM Sunday EAT)
     const weeklyData:any = data.filter((player: PlayerProps) => {
-      const createdAt = new Date(player.created_at);
+      const createdAt = new Date(player.start_time);
       return createdAt >= new Date(startOfWeekISO);
     });
   
     setDaily(dailyData);
     setWeekly(weeklyData);
   };
-  
-  
-
   const handlePriceChange = (event:any) => {
     setPrice(event.target.value);
   };
@@ -85,7 +81,20 @@ const startOfDayISO = startOfToday.toISOString();
     const totalDuration = data.reduce((sum, d:PlayerProps) => sum + d.duration, 0);
     return totalDuration * price
   };
-
+  const formatDate = (isoDate:string) => {
+    const date = new Date(isoDate);
+  
+    return date.toLocaleString('en-US', {
+      timeZone: 'Africa/Nairobi', // GMT+3
+      hour12: true, // 12-hour format
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+    });
+  };
   return (
     <div className="flex flex-col items-center  bg-gray-100 min-h-screen">
     <Container className="md:max-w-4xl p-0 m-0">
@@ -107,6 +116,7 @@ const startOfDayISO = startOfToday.toISOString();
       <Tabs value={tab} onChange={(_, newValue) => setTab(newValue)} centered>
         <Tab label="Daily Status" />
         <Tab label="Weekly Status" />
+        <Tab label="All Players" />
       </Tabs>
 
       {tab === 0 && (
@@ -132,7 +142,7 @@ const startOfDayISO = startOfToday.toISOString();
                   <TableRow key={player.id}>
                     <TableCell>{player.name}</TableCell>
                     <TableCell>{player.shoe_number}</TableCell>
-                    <TableCell>{dayjs(player.start_time).format("YYYY-MM-DD HH:mm")}</TableCell>
+                    <TableCell>{formatDate(player.start_time)}</TableCell>
                     <TableCell>{player.duration}</TableCell>
                   </TableRow>
                 ))}
@@ -165,10 +175,44 @@ const startOfDayISO = startOfToday.toISOString();
                   <TableRow key={player.id}>
                     <TableCell>{player.name}</TableCell>
                     <TableCell>{player.shoe_number}</TableCell>
-                    <TableCell>{dayjs(player.start_time).format("YYYY-MM-DD HH:mm")}</TableCell>
+                    <TableCell>{formatDate(player.start_time)}</TableCell>
                     <TableCell>{player.duration}</TableCell>
                   </TableRow>
                 ))}
+                
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </>
+      )}
+            {tab === 2 && (
+        <>
+          <Typography variant="h6" gutterBottom sx={{ color: 'black'}}>
+            Weekly Revenue: ${calculateRevenue(weekly)}
+          </Typography>
+          <Typography variant="h6" gutterBottom sx={{ color: 'black' }}>
+            Total Players:{weekly.length}
+          </Typography>
+          <TableContainer component={Paper}>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Name</TableCell>
+                  <TableCell>Shoe Number</TableCell>
+                  <TableCell>Created At</TableCell>
+                  <TableCell>Duration</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {weekly.map((player:PlayerProps) => (
+                  <TableRow key={player.id}>
+                    <TableCell>{player.name}</TableCell>
+                    <TableCell>{player.shoe_number}</TableCell>
+                    <TableCell>{formatDate(player.start_time)}</TableCell>
+                    <TableCell>{player.duration}</TableCell>
+                  </TableRow>
+                ))}
+                
               </TableBody>
             </Table>
           </TableContainer>
@@ -186,6 +230,25 @@ const startOfDayISO = startOfToday.toISOString();
         Try again
       </button>
     </div>}
+    {hasMore &&
+    <Button
+      onClick={()=>HandlerMoreData()}
+      variant="contained"
+      color="primary"
+      sx={{
+        mt: 2,
+        width: "200px",
+        display: "flex",
+        justifyContent: "center",
+        gap: 1,
+        fontWeight: "bold",
+        borderRadius: "8px",
+        textTransform: "none", // Keeps normal text casing
+      }}
+      disabled={loading}
+    >
+      {Tloading ? <CircularProgress size={24} color="inherit" /> : "Load More"}
+    </Button> }
     </Container>
     </div>
   );

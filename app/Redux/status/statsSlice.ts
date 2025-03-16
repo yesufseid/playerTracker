@@ -11,46 +11,35 @@ type PlayerProps={
 
 }
 interface PlayerState {
-  players: PlayerProps[];
   AllPlayers:PlayerProps[];
   loading: boolean;
   error: boolean;
   Tloading: boolean;
   Terror: boolean;
+  hasMore:boolean
+  newCursor:string
 }
 
 const initialState: PlayerState = {
-  players: [],
   AllPlayers:[],
   loading: false,
   error: false,
   Tloading: false,
   Terror: false,
+  hasMore:false,
+  newCursor:""
 };
-const  playerSlice = createSlice({
-  name: "player",
+const  playerStatuSlice = createSlice({
+  name: "Allplayer",
   initialState,
   reducers: {
-    setPlayer: (state, action) => {
-      state.players = action.payload;
-    },
-    addPlayer: (state, action) => {
-      state.players.push(action.payload)
-    },
     setAllPlayer: (state, action) => {
       state.AllPlayers = action.payload;
     },
     addAllPlayer: (state, action) => {
       state.AllPlayers.push(action.payload)
     },
-    removePlayer: (state, action) => {
-      state.players = state.players.filter((player:PlayerProps)=> player.id !== action.payload)
-    },
-    addDuration: (state, action) => {
-      const { id, duration } = action.payload; 
-      const playerIndex = state.players.findIndex((player:PlayerProps )=> player.id === id);
-      state.players[playerIndex].duration=duration
-    },
+  
     setLoading: (state, action) => {
       state.loading= state.loading=action.payload
     },
@@ -63,8 +52,14 @@ const  playerSlice = createSlice({
     setTError: (state, action) => {
       state.Terror= state.Terror=action.payload
     },
+    setHasMore: (state, action) => {
+        state.hasMore= state.hasMore=action.payload
+      },
+      setTNewCursor: (state, action) => {
+        state.newCursor= state.newCursor=action.payload
+      },
   },
 });
 
-export const { addPlayer,setPlayer,setError,setLoading,addDuration,setTError,setTLoading,removePlayer,setAllPlayer,addAllPlayer} =playerSlice.actions;
-export default playerSlice.reducer;
+export const {setError,setLoading,setTError,setTLoading,setAllPlayer,addAllPlayer,setHasMore,setTNewCursor} =playerStatuSlice.actions;
+export default playerStatuSlice.reducer;
