@@ -1,6 +1,7 @@
 import { call, put, takeEvery } from "redux-saga/effects";
-import {setLoading,setError,setTLoading,setAllPlayer,addAllPlayer,setHasMore,setTNewCursor} from "./statsSlice"
-import { GetStatus} from "../../lib/index";
+import {setLoading,setError,setTLoading,setAllPlayer,addAllPlayer,setHasMore,
+  setTNewCursor,setDailyPlayer,setWeekliyPlayer,addDailyPlayer,addWeekliyPlayer} from "./statsSlice"
+import { AddPlayer, GetStatus} from "../../lib/index";
 
 
 function* fetchandSetStatus(action:any): Generator<any, void, any>{
@@ -10,13 +11,15 @@ function* fetchandSetStatus(action:any): Generator<any, void, any>{
      // Pass arguments to GetGraduates
      const res=yield call(GetStatus,action.payload.limit,action.payload.cursor);
     yield put(setLoading(false));
-    yield put(setAllPlayer(res.data))
-    if(res.error){
-      yield put(setError(true))
-    }else{
+    if(res.data){
       yield put(setAllPlayer(res.data))
+      yield put(setDailyPlayer(res.dailyData))
+      yield put(setWeekliyPlayer(res.weeklyData))
       yield put(setHasMore(res.hasMore))
       yield put(setTNewCursor(res.newCursor))
+      
+    }else{
+      yield put(setError(true))
     }
   } catch (error) {
     console.error("Failed to fetch stats:", error);
@@ -27,14 +30,17 @@ function* fetchandAddStatus(action:any): Generator<any, void, any>{
       yield put(setError(false));
       yield put(setTLoading(true));
        // Pass arguments to GetGraduates
-       const {data,error,hasMore,newCursor} =yield call(GetStatus,action.payload.limit,action.payload.cursor);
+       const res =yield call(GetStatus,action.payload.limit,action.payload.cursor);
       yield put(setTLoading(false));
-      if(error){
-        yield put(setError(true))
+      if(res.data){
+        yield put(addAllPlayer(res.data))
+        yield put(addDailyPlayer(res.dailyData))
+        yield put(addWeekliyPlayer(res.weeklyData))
+        yield put(setHasMore(res.hasMore))
+        yield put(setTNewCursor(res.newCursor))
+        
       }else{
-        yield put(addAllPlayer(data))
-        yield put(setHasMore(hasMore))
-        yield put(setTNewCursor(newCursor))
+        yield put(setError(true))
       }
     } catch (error) {
       console.error("Failed to fetch stats:", error);

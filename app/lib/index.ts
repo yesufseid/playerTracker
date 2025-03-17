@@ -1,7 +1,37 @@
 "use server"
 import { createClient } from "@/utils/supabase/server";
 
+type PlayerProps={
+  id:string
+  name:string
+  start_time:string
+  duration:number
+  shoe_number:number
+}
 
+
+  const today = new Date();
+
+  // Convert local 6:00 AM to UTC (3:00 AM UTC)
+const startOfToday = new Date(today);
+startOfToday.setUTCHours(3, 0, 0, 0); // 6:00 AM EAT = 3:00 AM UTC
+const startOfDayISO = startOfToday.toISOString();
+
+// End of the "custom day" (5:59 AM the next day in EAT = 2:59 AM UTC)
+const endOfDay = new Date(startOfToday);
+endOfDay.setUTCDate(endOfDay.getUTCDate() + 1);  // Move to next day
+endOfDay.setUTCHours(2, 59, 59, 999);  // 5:59 AM EAT = 2:59 AM UTC
+const endOfDayISO = endOfDay.toISOString();
+
+  // Start of the week on Sunday at 6:00 AM (EAT) (converted to 3:00 AM UTC)
+  const startOfWeek = new Date(startOfToday);
+  startOfWeek.setUTCDate(startOfWeek.getUTCDate() - startOfWeek.getUTCDay()); // Set to Sunday
+  const startOfWeekISO = startOfWeek.toISOString()
+
+  // Filter daily data (created after 6:00 AM today and before 6:00 AM tomorrow EAT)
+
+  // Filter weekly data (created after 6:00 AM Sunday EAT)
+ 
 
 
 
@@ -124,11 +154,20 @@ const GetStatus = async (limit:number,cursor:any) => {
 
     // Check if more data exists
     const hasMore = data.length > limit;
-    const results = hasMore ? data.slice(0, limit) : data;
-    const newCursor = hasMore ? results[results.length - 1].start_time: null;
-    console.log(data);
+    const results = hasMore ? data.splice(0, limit) : data; // Modifies data
+    const newCursor = hasMore ? results[results.length - 1]?.start_time : null;
     
-    return { data: results, hasMore, newCursor };
+    
+    const dailyData:any =results.filter((player: PlayerProps) => {
+      const createdAt = new Date(player.start_time);
+      return createdAt >= new Date(startOfDayISO) && createdAt < new Date(endOfDayISO);
+    });
+  
+    const weeklyData:any = results.filter((player: PlayerProps) => {
+      const createdAt = new Date(player.start_time);
+      return createdAt >= new Date(startOfWeekISO);
+    });
+    return { data:results,dailyData,weeklyData, hasMore, newCursor };
   } catch (error) {
     console.error("Try-Catch Error:", error);
     return { error: true };

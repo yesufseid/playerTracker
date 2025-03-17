@@ -18,10 +18,14 @@ interface PlayerState {
   Terror: boolean;
   hasMore:boolean
   newCursor:string
+  dailyData:PlayerProps[],
+  weeklyData:PlayerProps[],
 }
 
 const initialState: PlayerState = {
   AllPlayers:[],
+  dailyData:[],
+  weeklyData:[],
   loading: false,
   error: false,
   Tloading: false,
@@ -36,10 +40,30 @@ const  playerStatuSlice = createSlice({
     setAllPlayer: (state, action) => {
       state.AllPlayers = action.payload;
     },
-    addAllPlayer: (state, action) => {
-      state.AllPlayers.push(action.payload)
+    setDailyPlayer: (state, action) => {
+      state.dailyData = action.payload;
     },
-  
+    setWeekliyPlayer: (state, action) => {
+      state.weeklyData = action.payload;
+    },
+    addAllPlayer: (state, action) => {
+      const newPlayers = action.payload.filter(
+        (player:PlayerProps) => !state.AllPlayers.some((existing) => existing.id === player.id)
+      );
+      state.AllPlayers = [...state.AllPlayers, ...newPlayers];
+    },
+    addDailyPlayer: (state, action) => {
+      const newPlayers = action.payload.filter(
+        (player:PlayerProps) => !state.dailyData.some((existing) => existing.id === player.id)
+      );
+      state.dailyData = [...state.dailyData, ...newPlayers];
+    },
+    addWeekliyPlayer: (state, action) => {
+      const newPlayers = action.payload.filter(
+        (player:PlayerProps) => !state.weeklyData.some((existing) => existing.id === player.id)
+      );
+      state.weeklyData = [...state.weeklyData, ...newPlayers];
+    },
     setLoading: (state, action) => {
       state.loading= state.loading=action.payload
     },
@@ -61,5 +85,6 @@ const  playerStatuSlice = createSlice({
   },
 });
 
-export const {setError,setLoading,setTError,setTLoading,setAllPlayer,addAllPlayer,setHasMore,setTNewCursor} =playerStatuSlice.actions;
+export const {setError,setLoading,setTError,setTLoading,setAllPlayer,
+  addAllPlayer,setHasMore,setTNewCursor,setDailyPlayer,setWeekliyPlayer,addDailyPlayer,addWeekliyPlayer} =playerStatuSlice.actions;
 export default playerStatuSlice.reducer;

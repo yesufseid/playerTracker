@@ -17,62 +17,56 @@ type PlayerProps={
 
 export default function StatusPage() {
   const dispatch = useDispatch<AppDispatch>();
-  const {AllPlayers,error,loading,Terror,hasMore,newCursor,Tloading} = useSelector((state: RootState) => state.Allplayer);
-  const [daily, setDaily] = useState([]);
-  const [weekly, setWeekly] = useState([]);
+  const {AllPlayers,error,loading,Terror,hasMore,newCursor,Tloading,dailyData,weeklyData} = useSelector((state: RootState) => state.Allplayer);
   const [tab, setTab] = useState(0);
   const [price, setPrice] = useState(200);
   const [tryAgain,setTray]=useState(false)
- 
-
   useEffect(() => {
     dispatch({ type: "players/fetchandSetStatus",payload:{limit:3,cursor:newCursor}});
-  }, [dispatch,tryAgain]);
-  useEffect(() => {
-    if (AllPlayers?.length > 0) {
-      filterData(AllPlayers);
-    }
-  }, [AllPlayers]); // Runs when AllPlayers changes
+  }, [dispatch]);
    const HandlerMoreData=async()=>{
     dispatch({ type: "players/fetchandAddStatus",payload:{limit:3,cursor:newCursor}});
    }
+console.log(AllPlayers);
+console.log(dailyData);
+console.log(weeklyData);
 
-  const filterData = (data:PlayerProps[]) => {
-    console.log("seya",data);
+//   const filterData = (data:PlayerProps[]) => {
+//     console.log("seya",data);
     
-    const today = new Date();
+//     const today = new Date();
   
-    // Convert local 6:00 AM to UTC (3:00 AM UTC)
-const startOfToday = new Date(today);
-startOfToday.setUTCHours(3, 0, 0, 0); // 6:00 AM EAT = 3:00 AM UTC
-const startOfDayISO = startOfToday.toISOString();
+//     // Convert local 6:00 AM to UTC (3:00 AM UTC)
+// const startOfToday = new Date(today);
+// startOfToday.setUTCHours(3, 0, 0, 0); // 6:00 AM EAT = 3:00 AM UTC
+// const startOfDayISO = startOfToday.toISOString();
   
-  // End of the "custom day" (5:59 AM the next day in EAT = 2:59 AM UTC)
-  const endOfDay = new Date(startOfToday);
-  endOfDay.setUTCDate(endOfDay.getUTCDate() + 1);  // Move to next day
-  endOfDay.setUTCHours(2, 59, 59, 999);  // 5:59 AM EAT = 2:59 AM UTC
-  const endOfDayISO = endOfDay.toISOString();
+//   // End of the "custom day" (5:59 AM the next day in EAT = 2:59 AM UTC)
+//   const endOfDay = new Date(startOfToday);
+//   endOfDay.setUTCDate(endOfDay.getUTCDate() + 1);  // Move to next day
+//   endOfDay.setUTCHours(2, 59, 59, 999);  // 5:59 AM EAT = 2:59 AM UTC
+//   const endOfDayISO = endOfDay.toISOString();
   
-    // Start of the week on Sunday at 6:00 AM (EAT) (converted to 3:00 AM UTC)
-    const startOfWeek = new Date(startOfToday);
-    startOfWeek.setUTCDate(startOfWeek.getUTCDate() - startOfWeek.getUTCDay()); // Set to Sunday
-    const startOfWeekISO = startOfWeek.toISOString()
+//     // Start of the week on Sunday at 6:00 AM (EAT) (converted to 3:00 AM UTC)
+//     const startOfWeek = new Date(startOfToday);
+//     startOfWeek.setUTCDate(startOfWeek.getUTCDate() - startOfWeek.getUTCDay()); // Set to Sunday
+//     const startOfWeekISO = startOfWeek.toISOString()
   
-    // Filter daily data (created after 6:00 AM today and before 6:00 AM tomorrow EAT)
-    const dailyData:any = data.filter((player: PlayerProps) => {
-      const createdAt = new Date(player.start_time);
-      return createdAt >= new Date(startOfDayISO) && createdAt < new Date(endOfDayISO);
-    });
+//     // Filter daily data (created after 6:00 AM today and before 6:00 AM tomorrow EAT)
+//     const dailyData:any = data.filter((player: PlayerProps) => {
+//       const createdAt = new Date(player.start_time);
+//       return createdAt >= new Date(startOfDayISO) && createdAt < new Date(endOfDayISO);
+//     });
   
-    // Filter weekly data (created after 6:00 AM Sunday EAT)
-    const weeklyData:any = data.filter((player: PlayerProps) => {
-      const createdAt = new Date(player.start_time);
-      return createdAt >= new Date(startOfWeekISO);
-    });
+//     // Filter weekly data (created after 6:00 AM Sunday EAT)
+//     const weeklyData:any = data.filter((player: PlayerProps) => {
+//       const createdAt = new Date(player.start_time);
+//       return createdAt >= new Date(startOfWeekISO);
+//     });
   
-    setDaily(dailyData);
-    setWeekly(weeklyData);
-  };
+//     setDaily(dailyData);
+//     setWeekly(weeklyData);
+//   };
   const handlePriceChange = (event:any) => {
     setPrice(event.target.value);
   };
@@ -122,10 +116,10 @@ const startOfDayISO = startOfToday.toISOString();
       {tab === 0 && (
         <>
           <Typography variant="h6" gutterBottom sx={{color: 'black' }}>
-            Daily Revenue: ${calculateRevenue(daily)}
+            Daily Revenue: ${calculateRevenue(dailyData)}
           </Typography>
           <Typography variant="h6" gutterBottom sx={{ color: 'black' }}>
-            Total Players:{daily.length}
+            Total Players:{dailyData.length}
           </Typography>
           <TableContainer component={Paper}>
             <Table>
@@ -138,7 +132,7 @@ const startOfDayISO = startOfToday.toISOString();
                 </TableRow>
               </TableHead>
               <TableBody>
-                {daily.map((player:PlayerProps) => (
+                {dailyData.map((player:PlayerProps) => (
                   <TableRow key={player.id}>
                     <TableCell>{player.name}</TableCell>
                     <TableCell>{player.shoe_number}</TableCell>
@@ -155,10 +149,10 @@ const startOfDayISO = startOfToday.toISOString();
       {tab === 1 && (
         <>
           <Typography variant="h6" gutterBottom sx={{ color: 'black'}}>
-            Weekly Revenue: ${calculateRevenue(weekly)}
+            Weekly Revenue: ${calculateRevenue(weeklyData)}
           </Typography>
           <Typography variant="h6" gutterBottom sx={{ color: 'black' }}>
-            Total Players:{weekly.length}
+            Total Players:{weeklyData.length}
           </Typography>
           <TableContainer component={Paper}>
             <Table>
@@ -171,7 +165,7 @@ const startOfDayISO = startOfToday.toISOString();
                 </TableRow>
               </TableHead>
               <TableBody>
-                {weekly.map((player:PlayerProps) => (
+                {weeklyData.map((player:PlayerProps) => (
                   <TableRow key={player.id}>
                     <TableCell>{player.name}</TableCell>
                     <TableCell>{player.shoe_number}</TableCell>
@@ -187,11 +181,8 @@ const startOfDayISO = startOfToday.toISOString();
       )}
             {tab === 2 && (
         <>
-          <Typography variant="h6" gutterBottom sx={{ color: 'black'}}>
-            Weekly Revenue: ${calculateRevenue(weekly)}
-          </Typography>
           <Typography variant="h6" gutterBottom sx={{ color: 'black' }}>
-            Total Players:{weekly.length}
+            Total Players:{AllPlayers.length}
           </Typography>
           <TableContainer component={Paper}>
             <Table>
@@ -204,7 +195,7 @@ const startOfDayISO = startOfToday.toISOString();
                 </TableRow>
               </TableHead>
               <TableBody>
-                {weekly.map((player:PlayerProps) => (
+                {AllPlayers.map((player:PlayerProps) => (
                   <TableRow key={player.id}>
                     <TableCell>{player.name}</TableCell>
                     <TableCell>{player.shoe_number}</TableCell>
