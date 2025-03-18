@@ -32,7 +32,7 @@ const handleSumit=()=>{
   };
 
   return (
-    <Dialog open={open} onClose={() => setOpen(false)} className='absolute' >
+    <Dialog open={open} onClose={() => setOpen(false)} >
       <DialogTitle>Add New Player</DialogTitle>
       <DialogContent>
         <TextField
@@ -74,6 +74,12 @@ const handleSumit=()=>{
             onChange={(e)=>handleCustomTimeChange(e)}
             InputLabelProps={{
               shrink: true,
+            }}
+            sx={{
+              "& input": {
+                color: "black",
+                bgcolor:"pink" // Ensures visibility
+              },
             }}
           />
         )}

@@ -93,46 +93,55 @@ const GetAll = async () => {
   }
 };
 
-// const GetStatus = async () => {
-//   const supabase = await createClient();
-//   const today = new Date();
+const GetStatusWeekliy = async () => {
+  const supabase = await createClient();
+  const today = new Date();
 
-// // Convert local 6:00 AM to UTC (3:00 AM UTC)
-// const startOfToday = new Date(today);
-// startOfToday.setUTCHours(3, 0, 0, 0); // 6:00 AM EAT = 3:00 AM UTC
+// Convert local 6:00 AM to UTC (3:00 AM UTC)
+const startOfToday = new Date(today);
+startOfToday.setUTCHours(3, 0, 0, 0); // 6:00 AM EAT = 3:00 AM UTC
 
-// // Find the start of the current week based on your 6:00 AM rule
-// const startOfWeek = new Date(startOfToday);
-// startOfWeek.setUTCDate(startOfWeek.getUTCDate() - startOfWeek.getUTCDay()); // Set to Sunday
-// const startOfWeekISO = startOfWeek.toISOString();
+// Find the start of the current week based on your 6:00 AM rule
+const startOfWeek = new Date(startOfToday);
+startOfWeek.setUTCDate(startOfWeek.getUTCDate() - startOfWeek.getUTCDay()); // Set to Sunday
+const startOfWeekISO = startOfWeek.toISOString();
 
-// // Get current time (UTC) as the end range
-// const nowISO = new Date().toISOString();
+// Get current time (UTC) as the end range
+const nowISO = new Date().toISOString();
   
-//   try {
-//     const { data, error } = await supabase
-//   .from('players')
-//   .select('*')
-//   .gte('start_time', startOfWeekISO)
-//   .lt('start_time', nowISO)
-//   .order('start_time',{ascending:false})
+  try {
+    const { data, error } = await supabase
+  .from('players')
+  .select('*')
+  .gte('start_time', startOfWeekISO)
+  .lt('start_time', nowISO)
+  .order('start_time',{ascending:false})
+
+    if (error) {
+      console.log(error);
+      return { error: true };
+    } else if(data.length >0) {
+      const newCursor =data[data.length - 1]?.start_time;
+      const dailyData:any =data.filter((player: PlayerProps) => {
+        const createdAt = new Date(player.start_time);
+        return createdAt >= new Date(startOfDayISO) && createdAt < new Date(endOfDayISO);
+      });
+      
+  const weeklyData:any = data.filter((player: PlayerProps) => {
+    const createdAt = new Date(player.start_time);
+    return createdAt >= new Date(startOfWeekISO);
+  });
     
-//     if (error) {
-//       console.log(error);
-//       return { error: true };
-//     } else {
-//       console.log(data);
-//       return data;
-//     }
-//   } catch (error) {
-//     console.log(error);
-//     return { error: true };
-//   }
-// }
+     const hasMore=true
+      return {data,dailyData,weeklyData,newCursor,hasMore}
+    }
+  } catch (error) {
+    console.log(error);
+    return { error: true };
+  }
+}
 
 const GetStatus = async (limit:number,cursor:any) => {
-  console.log(limit,cursor);
-  
   const supabase = await createClient();
   try {
     let query = supabase
@@ -158,16 +167,7 @@ const GetStatus = async (limit:number,cursor:any) => {
     const newCursor = hasMore ? results[results.length - 1]?.start_time : null;
     
     
-    const dailyData:any =results.filter((player: PlayerProps) => {
-      const createdAt = new Date(player.start_time);
-      return createdAt >= new Date(startOfDayISO) && createdAt < new Date(endOfDayISO);
-    });
-  
-    const weeklyData:any = results.filter((player: PlayerProps) => {
-      const createdAt = new Date(player.start_time);
-      return createdAt >= new Date(startOfWeekISO);
-    });
-    return { data:results,dailyData,weeklyData, hasMore, newCursor };
+    return { data:results, hasMore, newCursor };
   } catch (error) {
     console.error("Try-Catch Error:", error);
     return { error: true };
@@ -226,4 +226,4 @@ const deletePlayer=async(id:string)=>{
   }  
 }
 
-export {GetAll,AddPlayer,UpdateStatus,AddTime,deletePlayer,GetStatus}
+export {GetAll,AddPlayer,UpdateStatus,AddTime,deletePlayer,GetStatus,GetStatusWeekliy}

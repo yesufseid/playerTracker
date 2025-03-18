@@ -88,7 +88,7 @@ const calculateStatus = (player: Player) => {
   });
 
   return (
-    <Card className="w-full md:max-w-4xl shadow-lg">
+    <Card className="w-full lg:max-w-4xl shadow-lg">
       <Tabs value={tab} onChange={(_, newValue) => setTab(newValue)} centered>
         <Tab label="Active" />
         <Tab label="Pending" />

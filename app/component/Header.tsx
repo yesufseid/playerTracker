@@ -1,13 +1,29 @@
 "use client"
 import { Card} from '@mui/material';
 import Link from 'next/link';
+import { usePathname } from "next/navigation";
 export default function Header() {
+  const pathname = usePathname(); // Get the current path
   return (
     <Card className="w-full md:px-60 flex justify-between py-2">
          <h2 className="text-2xl font-bold mb-4 text-center">Game Player  Tracker</h2>
          <div className='flex gap-5 mr-5'>
-         <Link href={"/"} className='text-xl font-bold mb-4 text-center text-pink-600'>Home</Link>
-         <Link href={"/stats"} className='text-xl font-bold mb-4 text-center text-pink-600'>Stats</Link>
+         <Link 
+          href="/" 
+          className={`text-xl font-bold mb-4 text-center text-pink-600 ${
+            pathname === "/" ? "underline" : ""
+          }`}
+        >
+          Home
+        </Link>
+        <Link 
+          href="/stats" 
+          className={`text-xl font-bold mb-4 text-center text-pink-600 ${
+            pathname === "/stats" ? "underline" : ""
+          }`}
+        >
+          Stats
+        </Link>
          </div>
     </Card>
   )

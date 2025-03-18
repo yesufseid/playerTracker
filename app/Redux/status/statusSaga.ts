@@ -1,7 +1,7 @@
 import { call, put, takeEvery } from "redux-saga/effects";
 import {setLoading,setError,setTLoading,setAllPlayer,addAllPlayer,setHasMore,
   setTNewCursor,setDailyPlayer,setWeekliyPlayer,addDailyPlayer,addWeekliyPlayer} from "./statsSlice"
-import { AddPlayer, GetStatus} from "../../lib/index";
+import {GetStatus,GetStatusWeekliy} from "../../lib/index";
 
 
 function* fetchandSetStatus(action:any): Generator<any, void, any>{
@@ -9,7 +9,7 @@ function* fetchandSetStatus(action:any): Generator<any, void, any>{
     yield put(setError(false));
     yield put(setLoading(true));
      // Pass arguments to GetGraduates
-     const res=yield call(GetStatus,action.payload.limit,action.payload.cursor);
+     const res=yield call(GetStatusWeekliy);
     yield put(setLoading(false));
     if(res.data){
       yield put(setAllPlayer(res.data))
@@ -34,8 +34,6 @@ function* fetchandAddStatus(action:any): Generator<any, void, any>{
       yield put(setTLoading(false));
       if(res.data){
         yield put(addAllPlayer(res.data))
-        yield put(addDailyPlayer(res.dailyData))
-        yield put(addWeekliyPlayer(res.weeklyData))
         yield put(setHasMore(res.hasMore))
         yield put(setTNewCursor(res.newCursor))
         

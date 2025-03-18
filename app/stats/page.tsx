@@ -27,46 +27,7 @@ export default function StatusPage() {
    const HandlerMoreData=async()=>{
     dispatch({ type: "players/fetchandAddStatus",payload:{limit:3,cursor:newCursor}});
    }
-console.log(AllPlayers);
-console.log(dailyData);
-console.log(weeklyData);
 
-//   const filterData = (data:PlayerProps[]) => {
-//     console.log("seya",data);
-    
-//     const today = new Date();
-  
-//     // Convert local 6:00 AM to UTC (3:00 AM UTC)
-// const startOfToday = new Date(today);
-// startOfToday.setUTCHours(3, 0, 0, 0); // 6:00 AM EAT = 3:00 AM UTC
-// const startOfDayISO = startOfToday.toISOString();
-  
-//   // End of the "custom day" (5:59 AM the next day in EAT = 2:59 AM UTC)
-//   const endOfDay = new Date(startOfToday);
-//   endOfDay.setUTCDate(endOfDay.getUTCDate() + 1);  // Move to next day
-//   endOfDay.setUTCHours(2, 59, 59, 999);  // 5:59 AM EAT = 2:59 AM UTC
-//   const endOfDayISO = endOfDay.toISOString();
-  
-//     // Start of the week on Sunday at 6:00 AM (EAT) (converted to 3:00 AM UTC)
-//     const startOfWeek = new Date(startOfToday);
-//     startOfWeek.setUTCDate(startOfWeek.getUTCDate() - startOfWeek.getUTCDay()); // Set to Sunday
-//     const startOfWeekISO = startOfWeek.toISOString()
-  
-//     // Filter daily data (created after 6:00 AM today and before 6:00 AM tomorrow EAT)
-//     const dailyData:any = data.filter((player: PlayerProps) => {
-//       const createdAt = new Date(player.start_time);
-//       return createdAt >= new Date(startOfDayISO) && createdAt < new Date(endOfDayISO);
-//     });
-  
-//     // Filter weekly data (created after 6:00 AM Sunday EAT)
-//     const weeklyData:any = data.filter((player: PlayerProps) => {
-//       const createdAt = new Date(player.start_time);
-//       return createdAt >= new Date(startOfWeekISO);
-//     });
-  
-//     setDaily(dailyData);
-//     setWeekly(weeklyData);
-//   };
   const handlePriceChange = (event:any) => {
     setPrice(event.target.value);
   };
@@ -91,7 +52,7 @@ console.log(weeklyData);
   };
   return (
     <div className="flex flex-col items-center  bg-gray-100 min-h-screen">
-    <Container className="md:max-w-4xl p-0 m-0">
+    <Container className="lg:max-w-4xl p-0 m-0">
       <div className="md:px-5">
       <Typography variant="h4" gutterBottom  sx={{ marginTop: 2 ,color: 'black'} }>
         Player Status
@@ -221,7 +182,7 @@ console.log(weeklyData);
         Try again
       </button>
     </div>}
-    {hasMore &&
+    {hasMore && tab===2 &&
     <Button
       onClick={()=>HandlerMoreData()}
       variant="contained"
