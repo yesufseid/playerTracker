@@ -2,23 +2,24 @@
 
 import { useState} from 'react';
 import { Add } from '@mui/icons-material';
-import BasicTabs from './component/Tab';
-import AddPlayerDialog from './component/Dialog';
+import BasicTabs from '../component/Tab';
+import AddPlayerDialog from '../component/Dialog';
 import {  Button} from '@mui/material';
 
 
 
-const PlayerTracker = () => {
+
+const HomePage=() => {
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="flex flex-col items-center bg-gray-100 min-h-screen">
+    <div className="flex flex-col items-center bg-gray-100  lg:px-56">
      <BasicTabs />
       
       <Button
         variant="contained"
         color="primary"
-        className="fixed bottom-6 right-6"
+        className="absolute bottom-6 right-6"
         startIcon={<Add />}
         onClick={() => setOpen(true)}
       >
@@ -30,4 +31,4 @@ const PlayerTracker = () => {
   );
 };
 
-export default PlayerTracker;
+export default HomePage

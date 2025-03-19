@@ -78,7 +78,13 @@ const handleSumit=()=>{
             sx={{
               "& input": {
                 color: "black",
-                bgcolor:"pink" // Ensures visibility
+                backgroundColor: "white",
+              },
+              "& .MuiInputAdornment-root": {
+                color: "black",
+              },
+              "& .MuiSvgIcon-root": {
+                color: "black",
               },
             }}
           />

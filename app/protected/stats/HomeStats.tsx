@@ -2,9 +2,10 @@
 import { useEffect, useState } from "react";
 import { Container, Typography, Table, TableBody, TableCell, TableContainer, 
   TableHead, TableRow, Paper, Tabs, Tab, TextField,Button , CircularProgress } from "@mui/material";
-import Loading from "../component/Loading";
+import Loading from "../../component/Loading";
 import { useDispatch, useSelector } from "react-redux";
-import { RootState, AppDispatch } from "../Redux/store";
+import { RootState, AppDispatch } from "../../Redux/store";
+
 
 type PlayerProps={
   id:string
@@ -15,17 +16,17 @@ type PlayerProps={
 }
 
 
-export default function StatusPage() {
+export default function HomeStats() {
   const dispatch = useDispatch<AppDispatch>();
   const {AllPlayers,error,loading,Terror,hasMore,newCursor,Tloading,dailyData,weeklyData} = useSelector((state: RootState) => state.Allplayer);
   const [tab, setTab] = useState(0);
   const [price, setPrice] = useState(200);
   const [tryAgain,setTray]=useState(false)
   useEffect(() => {
-    dispatch({ type: "players/fetchandSetStatus",payload:{limit:3,cursor:newCursor}});
+    dispatch({ type: "players/fetchandSetStatus",payload:{limit:10,cursor:newCursor}});
   }, [dispatch]);
    const HandlerMoreData=async()=>{
-    dispatch({ type: "players/fetchandAddStatus",payload:{limit:3,cursor:newCursor}});
+    dispatch({ type: "players/fetchandAddStatus",payload:{limit:10,cursor:newCursor}});
    }
 
   const handlePriceChange = (event:any) => {
@@ -51,8 +52,8 @@ export default function StatusPage() {
     });
   };
   return (
-    <div className="flex flex-col items-center  bg-gray-100 min-h-screen">
-    <Container className="lg:max-w-4xl p-0 m-0">
+    <div className="flex flex-col items-center  bg-gray-100  lg:px-56 ">
+    <Container className="p-0 m-0">
       <div className="md:px-5">
       <Typography variant="h4" gutterBottom  sx={{ marginTop: 2 ,color: 'black'} }>
         Player Status

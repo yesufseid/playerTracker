@@ -35,12 +35,12 @@ export default function BasicTabs() {
     setLocalPlayers(players); // Ensure hydration consistency
   }, [players]);
 
-const handleAddTime=(id:string,duration:number)=>{
+const handleAddTime=async(id:string,duration:number)=>{
   dispatch({ type: "players/fechandAddTime",payload:{id:id,duration:duration}}); 
   Terror ? toast.error('Operation successful!', { autoClose: 3000 }):toast.success('Operation successful!', { autoClose: 3000 });
 }
-const handleDelete=(id:string)=>{
-  dispatch({ type: "players/fechandremove",payload:{id:id}}); 
+const handleDelete=async(id:string)=>{
+   dispatch({ type: "players/fechandremove",payload:{id:id}}); 
   Terror ? toast.error('somthing is wrong!', { autoClose: 3000 }):toast.success('Operation successful!', { autoClose: 3000 });
 }
 const handleStatus=(id:string)=>{
@@ -88,7 +88,7 @@ const calculateStatus = (player: Player) => {
   });
 
   return (
-    <Card className="w-full lg:max-w-4xl shadow-lg">
+    <Card className="w-full shadow-lg">
       <Tabs value={tab} onChange={(_, newValue) => setTab(newValue)} centered>
         <Tab label="Active" />
         <Tab label="Pending" />
@@ -114,9 +114,6 @@ const calculateStatus = (player: Player) => {
                 <IconButton  onClick={()=>handleAddTime(player.id,player.duration+1)} >
                   <Add color="primary" />
                   {player.duration}
-                </IconButton>
-                <IconButton  onClick={()=>handleDelete(player.id)} >
-                  <Delete color="error" />
                 </IconButton>
                 {
                   tab===2 &&

@@ -42,10 +42,10 @@ function* fechandAddPlayers(action:any): Generator<any, void, any> {
      // Pass arguments to GetGraduates
      const response =yield call(AddPlayer,action.payload.name,action.payload.shoeNumber, action.payload.startTime);
     yield put(setTLoading(false));
-    if(response.error){
-      yield put(setTError(true))
-    }else{
+    if(response.id){
       yield put(addPlayer(response))
+    }else{
+      yield put(setTError(true))
     }    
   } catch (error) {
     console.error("Failed to fetch stats:", error);
