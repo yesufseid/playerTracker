@@ -13,7 +13,7 @@ export default async function Login(props: { searchParams: Promise<Message> }) {
       <h1 className="text-2xl font-medium text-black">Sign in</h1>
       <p className="text-sm  text-black">
         forgot-password?{" "}
-        <Link className=" font-medium underline" href="/forgot-password">
+        <Link className=" font-medium underline" href="'/protected/reset-password">
            reset
         </Link>
       </p>
