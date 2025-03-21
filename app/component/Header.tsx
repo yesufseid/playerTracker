@@ -8,7 +8,6 @@ export default function Header() {
   return (
     <Card className="w-full md:px-60 flex justify-between py-2">
          <h2 className="text-2xl font-bold mb-4 text-center">Game Player  Tracker</h2>
-         <ThemeSwitcher />
          <div className='flex gap-5 mr-5'>
          <Link 
           href="/protected" 

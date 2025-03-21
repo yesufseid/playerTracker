@@ -21,7 +21,7 @@ export default async function Login(props: { searchParams: Promise<Message> }) {
         <div className="flex justify-between items-center">
           <Label htmlFor="password" className="text-black">Password</Label>
           <Link
-            className="text-xs text-foreground underline"
+            className="text-xs text-black underline"
             href="/protected/reset-password"
           >
             Forgot Password?
