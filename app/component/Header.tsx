@@ -10,7 +10,7 @@ export default function Header() {
          <h2 className="text-2xl font-bold mb-4 text-center">Game Player  Tracker</h2>
          <div className='flex gap-5 mr-5'>
          <Link 
-          href="/protected" 
+          href="/" 
           className={`text-xl font-bold mb-4 text-center text-pink-600 ${
             pathname === "/" ? "underline" : ""
           }`}
@@ -18,7 +18,7 @@ export default function Header() {
           Home
         </Link>
         <Link 
-          href="/protected/stats" 
+          href="/stats" 
           className={`text-xl font-bold mb-4 text-center text-pink-600 ${
             pathname === "/stats" ? "underline" : ""
           }`}

@@ -2,9 +2,9 @@
 import { useEffect, useState } from "react";
 import { Container, Typography, Table, TableBody, TableCell, TableContainer, 
   TableHead, TableRow, Paper, Tabs, Tab, TextField,Button , CircularProgress } from "@mui/material";
-import Loading from "../../component/Loading";
+import Loading from "../component/Loading";
 import { useDispatch, useSelector } from "react-redux";
-import { RootState, AppDispatch } from "../../Redux/store";
+import { RootState, AppDispatch } from "../Redux/store";
 
 
 type PlayerProps={

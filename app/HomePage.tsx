@@ -2,8 +2,8 @@
 
 import { useState} from 'react';
 import { Add } from '@mui/icons-material';
-import BasicTabs from '../component/Tab';
-import AddPlayerDialog from '../component/Dialog';
+import BasicTabs from './component/Tab';
+import AddPlayerDialog from './component/Dialog';
 import {  Button} from '@mui/material';
 
 
